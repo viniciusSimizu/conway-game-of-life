@@ -1,6 +1,7 @@
 .settings/
 target/
 build/
+WEB-INF/lib/
 
 .classpath
 .project
