@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/")
+@WebServlet("")
 public class HomeServlet extends HttpServlet {
 
     @Override
@@ -21,9 +21,9 @@ public class HomeServlet extends HttpServlet {
 
         IConwayDAO conway = null;
         var settingDto = new SettingDTO();
-        settingDto.loadDefaults();
-
         String populationState = req.getParameter("populationState");
+
+        settingDto.loadDefaults();
         settingDto.setDimension(req.getParameter("dimension"));
         settingDto.setRadius(req.getParameter("radius"));
         settingDto.setCells(req.getParameter("cells"));
@@ -40,9 +40,10 @@ public class HomeServlet extends HttpServlet {
         }
 
         if (conway != null && conway.getState() != null) {
-            req.setAttribute("state", conway.getState());
+            var session = req.getSession();
+            session.setAttribute("state", conway.getState());
         }
 
-        req.getRequestDispatcher("/WEB-INF/jsp/index.jsp").forward(req, resp);
+        req.getRequestDispatcher("/WEB-INF/jsp/home.jsp").forward(req, resp);
     }
 }

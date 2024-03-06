@@ -9,3 +9,7 @@
 	</tr>
 	</c:forEach>
 </table>
+
+<script>
+		localStorage.setItem("population", "${populationText}");
+</script>

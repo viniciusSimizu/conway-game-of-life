@@ -2,6 +2,7 @@ package br.com.vini.conway.servlets;
 
 import br.com.vini.conway.dao.ConwayDAO;
 import br.com.vini.conway.dtos.SettingDTO;
+import br.com.vini.conway.interfaces.IConwayDAO;
 
 import java.io.IOException;
 
@@ -15,9 +16,27 @@ import javax.servlet.http.HttpServletResponse;
 public class PopulationServlet extends HttpServlet {
 
     @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        var sess = req.getSession();
+        var conway = (IConwayDAO) sess.getAttribute("conway");
+
+        if (conway == null) {
+            resp.sendError(403, "Without session");
+            return;
+        }
+
+        req.setAttribute("population", conway.getState());
+        req.setAttribute("populationText", conway.getStateText());
+        req.getRequestDispatcher("/WEB-INF/jsp/population.jsp").forward(req, resp);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        var sess = req.getSession();
         var settingDto = new SettingDTO();
         settingDto.setDimension(req.getParameter("dimension"));
         settingDto.setCells(req.getParameter("cells"));
@@ -28,46 +47,32 @@ public class PopulationServlet extends HttpServlet {
             return;
         }
 
-        var conway = new ConwayDAO();
+        var conway = (IConwayDAO) sess.getAttribute("conway");
+        if (conway == null) {
+            conway = new ConwayDAO();
+            sess.setAttribute("conway", conway);
+        }
 
         conway.setDimension(settingDto.getDimension());
         conway.setRadius(settingDto.getRadius());
         conway.setCells(settingDto.getCells());
         conway.newPopulation();
 
-        var population = conway.getState();
-        var populationText = conway.getStateText();
-
-        req.setAttribute("population", population);
-        req.setAttribute("populationState", populationText);
-
-        req.getRequestDispatcher("/WEB-INF/jsp/population.jsp").forward(req, resp);
+        this.doGet(req, resp);
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String populationState = req.getParameter("populationState");
+        var sess = req.getSession();
 
-        if (populationState == null || populationState.isBlank()) {
-            resp.sendError(400, "Population not provided");
-            return;
-        }
-
-        var conway = new ConwayDAO();
-        var loaded = conway.loadPopulation(populationState);
-
-        if (!loaded) {
-            resp.sendError(400, "Population invalid");
+        var conway = (IConwayDAO) sess.getAttribute("conway");
+        if (conway == null) {
+            this.doPost(req, resp);
             return;
         }
 
         conway.nextTick();
-
-        req.setAttribute("population", conway.getState());
-        req.setAttribute("populationState", conway.getStateText());
-
-        req.getRequestDispatcher("/WEB-INF/jsp/population.jsp").forward(req, resp);
     }
 }
