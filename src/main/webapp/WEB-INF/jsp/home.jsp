@@ -33,14 +33,19 @@
 			<label id="cells">
 				Cells:
 				<input type="number" name="cells" value="${setting.cells}"/>
-				<span>${setting.cells}</span>
 			</label>
 
 			<button type="submit">New Seed</button>
 		</form>
 		<div>
-			<button id="next-tick">Next Tick</button>
+			<button id="next-tick"
+				hx-on:click="nextTick()">Next Tick</button>
 			<button id="auto-play">Auto Play</button>
+			<button id="load-session"
+				hx-post="${pageContext.request.contextPath}/population/import"
+				hx-vals='js:{"populationText": localStorage.getItem("population")}'
+				hx-on::after-request="drawPopulation()"
+				hx-swap="none">Load</button>
 		</div>
 	</div>
 
@@ -54,9 +59,6 @@
 		var ctx = "${pageContext.request.contextPath}";
 	</script>
 	<script src="js/home.js" type="text/javascript"></script>
-	<script>
-
-	</script>
 
 </body>
 </html>

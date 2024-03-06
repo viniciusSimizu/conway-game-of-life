@@ -20,6 +20,7 @@ public class PopulationServlet extends HttpServlet {
             throws ServletException, IOException {
 
         var sess = req.getSession();
+        System.out.println(sess.getAttribute("conway"));
         var conway = (IConwayDAO) sess.getAttribute("conway");
 
         if (conway == null) {
@@ -38,6 +39,7 @@ public class PopulationServlet extends HttpServlet {
 
         var sess = req.getSession();
         var settingDto = new SettingDTO();
+
         settingDto.setDimension(req.getParameter("dimension"));
         settingDto.setCells(req.getParameter("cells"));
         settingDto.setRadius(req.getParameter("radius"));
@@ -66,8 +68,8 @@ public class PopulationServlet extends HttpServlet {
             throws ServletException, IOException {
 
         var sess = req.getSession();
-
         var conway = (IConwayDAO) sess.getAttribute("conway");
+
         if (conway == null) {
             this.doPost(req, resp);
             return;
